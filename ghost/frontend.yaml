@@ -2,6 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: ghost
+  namespace: argocd
   labels:
     name: ghost
     instance: ghost
@@ -23,6 +24,7 @@ kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
   name: ghost
+  namespace: argocd
   labels:
     name: ghost
     instance: ghost
@@ -39,6 +41,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: ghost
+  namespace: argocd
   labels:
     name: ghost
     instance: ghost

@@ -1,10 +1,11 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  generateName: presync-astra-backup-
+  name: presync-astra-backup
+  namespace: argocd
   annotations:
     argocd.argoproj.io/hook: PreSync
-    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
 spec:
   template:
     spec:

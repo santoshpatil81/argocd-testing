@@ -2,16 +2,16 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: ghost-demo
+  namespace: argocd
 spec:
   destination:
-    name: ''
-    namespace: ghost
+    namespace: argocd
     server: 'https://kubernetes.default.svc'
   source:
     path: ghost
     repoURL: 'https://github.com/santoshpatil81/argocd-testing'
     targetRevision: HEAD
-  project: default
+  project: test-project
   syncPolicy:
     automated:
       prune: true
