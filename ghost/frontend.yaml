@@ -1,12 +1,10 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: ghost
+  name: argocd-demo
   namespace: argocd
   labels:
-    name: ghost
-    instance: ghost
-    component: ghost
+    name: argocd-demo
 spec:
   type: LoadBalancer
   externalTrafficPolicy: "Cluster"
@@ -15,102 +13,28 @@ spec:
       port: 80
       protocol: TCP
       targetPort: http
-  selector:
-    name: ghost
-    instance: ghost
-    component: ghost
----
-kind: PersistentVolumeClaim
-apiVersion: v1
-metadata:
-  name: ghost
-  namespace: argocd
-  labels:
-    name: ghost
-    instance: ghost
-    component: ghost
-    volume: persistent
-spec:
-  accessModes:
-    - ReadWriteMany
-  resources:
-    requests:
-      storage: "100Gi"
+
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ghost1
+  name: argocd-demo
   namespace: argocd
   labels:
-    name: ghost
-    instance: ghost
-    component: ghost
+    app.kubernetes.io/name: nginx
 spec:
-  replicas: 2
-  strategy:
-    type: RollingUpdate
+  replicas: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: nginx
   template:
     metadata:
       labels:
-        name: ghost
-        instance: ghost
-        component: ghost
+        app.kubernetes.io/name: nginx
     spec:
-      securityContext:
-        fsGroup: 1001
       containers:
-        - name: ghost
-          image: docker.io/bitnami/ghost:5.35.1-debian-11-r1
-          imagePullPolicy: "IfNotPresent"
-          securityContext:
-            runAsNonRoot: true
-            runAsUser: 1001
-          env:
-            - name: BITNAMI_DEBUG
-              value: "false"
-            - name: ALLOW_EMPTY_PASSWORD
-              value: "yes"
-            - name: GHOST_DATABASE_HOST
-              value: "ghost-mysql"
-            - name: GHOST_DATABASE_PORT_NUMBER
-              value: "3306"
-            - name: GHOST_DATABASE_NAME
-              value: "bitnami_ghost"
-            - name: GHOST_DATABASE_USER
-              value: "bn_ghost"
-            - name: GHOST_DATABASE_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: ghost-mysql
-                  key: mysql-password
-            - name: GHOST_PORT_NUMBER
-              value: "2368"
-            - name: GHOST_USERNAME
-              value: "user"
-            - name: GHOST_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: ghost
-                  key: ghost-password
-            - name: GHOST_HOST
-              value: "ghost.astrademo.net/"
-            - name: GHOST_EMAIL
-              value: "user@example.com"
-            - name: GHOST_BLOG_TITLE
-              value: "User's Blog"
-            - name: GHOST_ENABLE_HTTPS
-              value: "no"
-            - name: GHOST_SKIP_BOOTSTRAP
-              value: "no"
-          ports:
-            - name: http
-              containerPort: 2368
-              protocol: TCP
-          volumeMounts:
-            - name: ghost-data
-              mountPath: /bitnami/ghost
-      volumes:
-        - name: ghost-data
-          persistentVolumeClaim:
-            claimName: ghost
+      - name: nginx
+        image: nginx:latest
+        ports:
+          - name: http
+            containerPort: 80

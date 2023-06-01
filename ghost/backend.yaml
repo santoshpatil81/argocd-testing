@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: ghost-mysql
+  name: argocd-demo-mysql
   namespace: argocd
   labels:
     name: mysql
-    instance: ghost
+    instance: argocd-demo
     component: primary
 spec:
   type: ClusterIP
@@ -40,25 +40,25 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ghost-mysql
+  name: argocd-demo-mysql
   namespace: argocd
   labels:
-    name: mysql
-    instance: ghost
-    component: primary
+      name: argocd-demo
+      instance: argocd-demo
+      component: primary
 spec:
   selector:
     matchLabels:
-      name: mysql
-      instance: ghost
+      name: argocd-demo
+      instance: argocd-demo
       component: primary
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        name: mysql
-        instance: ghost
+        name: argocd-demo
+        instance: argocd-demo
         component: primary
     spec:
       securityContext:
@@ -107,11 +107,11 @@ spec:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: ghost-mysql
+  name: argocd-demo-mysql
   namespace: argocd
   labels:
-    name: mysql
-    instance: ghost
+    name: argocd-demo
+    instance: argocd-demo
     component: primary
 data:
   my.cnf: |-
