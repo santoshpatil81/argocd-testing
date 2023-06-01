@@ -9,33 +9,41 @@ metadata:
 spec:
   template:
     spec:
+      initContainers:
+        - image: k8s.gcr.io/git-sync:v3.1.6
+          name: git-sync-sidecar
+          args:
+            - "-repo=git@github.com:open-policy-agent/conftest.git"
+            - "-branch=master"
+            - "-depth=1"
+            - "-max-sync-failures=-1"
+            - "-root=/conftest"
+            - "-dest=from-github"
+            - "-wait=60"
+            - "-ssh=true"
+          volumeMounts:
+            - name: conftest_code
+              mountPath: /conftest
+              readOnly: false
+          securityContext:
+            runAsUser: 65533
       containers:
-      - name: alpine-actoolkit
-        image: alpine:latest
-        env:
-          - name: APPNAME
-            value: "ghost-argocd"
-          - name: CLUSTERNAME
-            value: "aks-eastus-cluster"
-          - name: ACTOOLKIT_VERSION
-            value: "2.6.2"
-        command: ["/bin/sh"]
-        args:
-        - -c
-        - >
-          apk add py3-pip jq &&
-          python3 -m pip install --upgrade pip &&
-          python3 -m pip install actoolkit==$ACTOOLKIT_VERSION &&
-          for i in `actoolkit -o json list apps -f $APPNAME -c $CLUSTERNAME | jq -r '.items[].id'`;
-          do
-            echo actoolkit: backing up app $APPNAME / $i;
-            actoolkit create backup $i argo-presync-`date "+%Y%m%d%H%M%S"`;
-          done
-        volumeMounts:
-          - mountPath: /etc/astra-toolkits
-            name: astra-control-config
-            readOnly: true
-      restartPolicy: Never
+        - name: conftest
+          image: alpine:latest
+          command: ["/bin/sh"]
+          args:
+          - -c
+          - >
+            LATEST_VERSION=$(wget -O - "https://api.github.com/repos/open-policy-agent/conftest/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/' | cut -c 2-) &&
+            wget "https://github.com/open-policy-agent/conftest/releases/download/v${LATEST_VERSION}/conftest_${LATEST_VERSION}_Linux_x86_64.tar.gz" &&
+            tar xzf conftest_${LATEST_VERSION}_Linux_x86_64.tar.gz &&
+            conftest test '/conftest/examples/kubernetes/deployment+service.yaml' -p /conftest/examples/kubernetes/policy -o json >> /tmp/out.json &&
+            cat /tmp/out.json
+          volumeMounts:
+            - name: conftest_code
+              mountPath: /conftest
+              readOnly: false
+        restartPolicy: Never
   backoffLimit: 1
 ---
 apiVersion: batch/v1
