@@ -9,24 +9,6 @@ metadata:
 spec:
   template:
     spec:
-      initContainers:
-        - image: k8s.gcr.io/git-sync:v3.1.6
-          name: git-sync-sidecar
-          args:
-            - "-repo=git@github.com:open-policy-agent/conftest.git"
-            - "-branch=master"
-            - "-depth=1"
-            - "-max-sync-failures=-1"
-            - "-root=/conftest"
-            - "-dest=from-github"
-            - "-wait=60"
-            - "-ssh=true"
-          volumeMounts:
-            - name: conftest_code
-              mountPath: /conftest
-              readOnly: false
-          securityContext:
-            runAsUser: 65533
       containers:
         - name: conftest
           image: alpine:latest
