@@ -1,0 +1,143 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ghost-mysql
+  labels:
+    name: mysql
+    instance: ghost
+    component: primary
+spec:
+  type: ClusterIP
+  ports:
+    - name: mysql
+      port: 3306
+      protocol: TCP
+      targetPort: mysql
+      nodePort: null
+  selector: 
+    name: mysql
+    instance: ghost
+    component: primary
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-pv-claim
+  labels: 
+    name: mysql
+    instance: ghost
+    component: primary
+    volume: persistent
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ghost-mysql
+  labels:
+    name: mysql
+    instance: ghost
+    component: primary
+spec:
+  selector:
+    matchLabels: 
+      name: mysql
+      instance: ghost
+      component: primary
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        name: mysql
+        instance: ghost
+        component: primary
+    spec:
+      securityContext:
+        fsGroup: 1001
+      containers:
+        - name: mysql
+          image: docker.io/bitnami/mysql:8.0.32-debian-11-r8
+          imagePullPolicy: "IfNotPresent"
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1001
+          env:
+            - name: BITNAMI_DEBUG
+              value: "false"
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: ghost-mysql
+                  key: mysql-root-password
+            - name: MYSQL_USER
+              value: "bn_ghost"
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: ghost-mysql
+                  key: mysql-password
+            - name: MYSQL_DATABASE
+              value: "bitnami_ghost"
+          ports:
+            - name: mysql
+              containerPort: 3306
+          volumeMounts:
+            - name: data
+              mountPath: /bitnami/mysql
+            - name: config
+              mountPath: /opt/bitnami/mysql/conf/my.cnf
+              subPath: my.cnf
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: mysql-pv-claim
+        - name: config
+          configMap:
+            name: ghost-mysql
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ghost-mysql
+  labels:
+    name: mysql
+    instance: ghost
+    component: primary
+data:
+  my.cnf: |-
+    [mysqld]
+    default_authentication_plugin=mysql_native_password
+    skip-name-resolve
+    explicit_defaults_for_timestamp
+    basedir=/opt/bitnami/mysql
+    plugin_dir=/opt/bitnami/mysql/lib/plugin
+    port=3306
+    socket=/opt/bitnami/mysql/tmp/mysql.sock
+    datadir=/bitnami/mysql/data
+    tmpdir=/opt/bitnami/mysql/tmp
+    max_allowed_packet=16M
+    bind-address=*
+    pid-file=/opt/bitnami/mysql/tmp/mysqld.pid
+    log-error=/opt/bitnami/mysql/logs/mysqld.log
+    character-set-server=UTF8
+    collation-server=utf8_general_ci
+    slow_query_log=0
+    slow_query_log_file=/opt/bitnami/mysql/logs/mysqld.log
+    long_query_time=10.0
+    
+    [client]
+    port=3306
+    socket=/opt/bitnami/mysql/tmp/mysql.sock
+    default-character-set=UTF8
+    plugin_dir=/opt/bitnami/mysql/lib/plugin
+    
+    [manager]
+    port=3306
+    socket=/opt/bitnami/mysql/tmp/mysql.sock
+    pid-file=/opt/bitnami/mysql/tmp/mysqld.pid
