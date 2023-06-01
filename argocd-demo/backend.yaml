@@ -17,7 +17,7 @@ spec:
       nodePort: null
   selector:
     name: mysql
-    instance: ghost
+    instance: argocd-demo
     component: primary
 ---
 apiVersion: v1
@@ -27,7 +27,7 @@ metadata:
   namespace: argocd
   labels:
     name: mysql
-    instance: ghost
+    instance: argocd-demo
     component: primary
     volume: persistent
 spec:
