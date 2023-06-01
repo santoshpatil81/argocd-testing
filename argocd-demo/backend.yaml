@@ -20,23 +20,6 @@ spec:
     instance: argocd-demo
     component: primary
 ---
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: mysql-pv-claim
-  namespace: argocd
-  labels:
-    name: mysql
-    instance: argocd-demo
-    component: primary
-    volume: persistent
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 100Gi
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -96,13 +79,6 @@ spec:
             - name: config
               mountPath: /opt/bitnami/mysql/conf/my.cnf
               subPath: my.cnf
-      volumes:
-        - name: data
-          persistentVolumeClaim:
-            claimName: mysql-pv-claim
-        - name: config
-          configMap:
-            name: ghost-mysql
 ---
 apiVersion: v1
 kind: ConfigMap
