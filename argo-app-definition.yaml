@@ -16,3 +16,8 @@ spec:
     automated:
       prune: true
       selfHeal: true
+      allowEmpty: true
+    syncOptions:
+      - Validate=true
+      - CreateNamespace=true
+      - preserveResourcesOnDeletion=true
