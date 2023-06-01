@@ -40,17 +40,13 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ghost
+  name: ghost1
   namespace: argocd
   labels:
     name: ghost
     instance: ghost
     component: ghost
 spec:
-  selector:
-    matchLabels:
-      name: ghost
-      instance: ghost
   replicas: 2
   strategy:
     type: RollingUpdate
