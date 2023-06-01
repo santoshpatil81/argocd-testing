@@ -26,7 +26,7 @@ spec:
               mountPath: /conftest
               readOnly: false
           securityContext:
-            runAsUser: 65533 # git-sync-user
+            runAsUser: 65533
       containers:
         - name: conftest
           image: alpine:latest
