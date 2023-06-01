@@ -1,24 +1,3 @@
-apiVersion: v1
-kind: Service
-metadata:
-  name: argocd-demo-mysql
-  namespace: argocd
-  labels:
-    name: mysql
-    instance: argocd-demo
-    component: primary
-spec:
-  type: ClusterIP
-  ports:
-    - name: mysql
-      port: 3306
-      protocol: TCP
-      targetPort: mysql
-      nodePort: null
-  selector:
-    name: mysql
-    instance: argocd-demo
-    component: primary
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -26,59 +5,23 @@ metadata:
   name: argocd-demo-mysql
   namespace: argocd
   labels:
-      name: argocd-demo
-      instance: argocd-demo
-      component: primary
+    app.kubernetes.io/name: nginx
 spec:
+  replicas: 3
   selector:
     matchLabels:
-      name: argocd-demo
-      instance: argocd-demo
-      component: primary
-  strategy:
-    type: Recreate
+      app.kubernetes.io/name: nginx
   template:
     metadata:
       labels:
-        name: argocd-demo
-        instance: argocd-demo
-        component: primary
+        app.kubernetes.io/name: nginx
     spec:
-      securityContext:
-        fsGroup: 1001
       containers:
-        - name: mysql
-          image: docker.io/bitnami/mysql:8.0.32-debian-11-r8
-          imagePullPolicy: "IfNotPresent"
-          securityContext:
-            runAsNonRoot: true
-            runAsUser: 1001
-          env:
-            - name: BITNAMI_DEBUG
-              value: "false"
-            - name: MYSQL_ROOT_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: ghost-mysql
-                  key: mysql-root-password
-            - name: MYSQL_USER
-              value: "bn_ghost"
-            - name: MYSQL_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: ghost-mysql
-                  key: mysql-password
-            - name: MYSQL_DATABASE
-              value: "bitnami_ghost"
-          ports:
-            - name: mysql
-              containerPort: 3306
-          volumeMounts:
-            - name: data
-              mountPath: /bitnami/mysql
-            - name: config
-              mountPath: /opt/bitnami/mysql/conf/my.cnf
-              subPath: my.cnf
+      - name: nginx
+        image: nginx:latest
+        ports:
+          - name: http
+            containerPort: 80
 ---
 apiVersion: v1
 kind: ConfigMap
