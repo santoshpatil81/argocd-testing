@@ -2,73 +2,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: argocd-demo-mysql
-  namespace: argocd
-  labels:
-    app.kubernetes.io/name: nginx
-spec:
-  replicas: 3
-  selector:
-    matchLabels:
-      app.kubernetes.io/name: nginx
-  template:
-    metadata:
-      labels:
-        app.kubernetes.io/name: nginx
-    spec:
-      containers:
-      - name: nginx
-        image: nginx:latest
-        ports:
-          - name: http
-            containerPort: 80
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: argocd-demo-mysql
-  namespace: argocd
-  labels:
-    name: argocd-demo
-    instance: argocd-demo
-    component: primary
-data:
-  my.cnf: |-
-    [mysqld]
-    default_authentication_plugin=mysql_native_password
-    skip-name-resolve
-    explicit_defaults_for_timestamp
-    basedir=/opt/bitnami/mysql
-    plugin_dir=/opt/bitnami/mysql/lib/plugin
-    port=3306
-    socket=/opt/bitnami/mysql/tmp/mysql.sock
-    datadir=/bitnami/mysql/data
-    tmpdir=/opt/bitnami/mysql/tmp
-    max_allowed_packet=16M
-    bind-address=*
-    pid-file=/opt/bitnami/mysql/tmp/mysqld.pid
-    log-error=/opt/bitnami/mysql/logs/mysqld.log
-    character-set-server=UTF8
-    collation-server=utf8_general_ci
-    slow_query_log=0
-    slow_query_log_file=/opt/bitnami/mysql/logs/mysqld.log
-    long_query_time=10.0
-
-    [client]
-    port=3306
-    socket=/opt/bitnami/mysql/tmp/mysql.sock
-    default-character-set=UTF8
-    plugin_dir=/opt/bitnami/mysql/lib/plugin
-
-    [manager]
-    port=3306
-    socket=/opt/bitnami/mysql/tmp/mysql.sock
-    pid-file=/opt/bitnami/mysql/tmp/mysqld.pid
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: argocd-demo-mysql-1
+  name: argocd-demo-001
   namespace: argocd
   labels:
     app.kubernetes.io/name: nginx
@@ -92,7 +26,31 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: argocd-demo-mysql-2
+  name: argocd-demo-002
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: nginx
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: nginx
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        ports:
+          - name: http
+            containerPort: 80
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: argocd-demo-003
   namespace: argocd
   labels:
     app.kubernetes.io/name: nginx
