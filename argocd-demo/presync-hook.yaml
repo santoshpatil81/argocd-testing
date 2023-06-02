@@ -17,7 +17,7 @@ spec:
             secretName: git-creds
             defaultMode: 0400
       initContainers:
-        - image: k8s.gcr.io/git-sync:v3.6.6
+        - image: asia.gcr.io/k8s-artifacts-prod/git-sync/git-sync@sha256:7231f6c2284758b91caed71e4e596413df31ac4467de9b596dc6b386b82f624f
           name: git-sync-sidecar
           env:
             - name: GIT_SYNC_REPO
