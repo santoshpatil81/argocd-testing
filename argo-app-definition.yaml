@@ -20,3 +20,4 @@ spec:
       - Validate=true
       - CreateNamespace=true
       - preserveResourcesOnDeletion=true
+    retry: 0
