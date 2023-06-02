@@ -5,22 +5,23 @@ metadata:
   name: gitsync-exechook-script
 data:
   gitsync_exechook_cmd_to_use.sh: |
-  #!/bin/sh
-  # this script will be executed in active path ${GIT_SYNC_ROOT}/(hash)
-  # assuming it can write and erase path /dags_dest
+    #!/bin/sh
+    # this script will be executed in active path ${GIT_SYNC_ROOT}/(hash)
+    # assuming it can write and erase path /dags_dest
 
-  # unless v level of git-sync is set to 6, echo message will not be shown in docker console.
+    # unless v level of git-sync is set to 6, echo message will not be shown in docker console.
 
-  # Empty the /dags_dest directory
-  if [ "$(ls -A /tmp/from-github)" ]; then
-      echo "/dags_dest is not empty. Removing all files and directories."
-      rm -rf /repo/*
-  fi
-  # Copy everything under the active directory to /dags_dest
-  cp -R . /repo
-  cp -R /repo /conftest-code
-  echo "Files copied to /conftest-code."
-  echo $(ls -la /conftest-code)
+    # Empty the /dags_dest directory
+    if [ "$(ls -A /dags_dest)" ]; then
+        echo "/dags_dest is not empty. Removing all files and directories."
+        rm -rf /dags_dest/*
+    fi
+
+    # Copy everything under the active directory to /dags_dest
+    cp -R . /dags_dest/
+    cp -R ./conftest-code
+
+    echo "Files copied to /dags_dest."
 
 ---
 apiVersion: batch/v1
