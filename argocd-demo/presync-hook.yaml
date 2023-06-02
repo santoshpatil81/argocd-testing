@@ -34,16 +34,15 @@ spec:
           args:
           - -c
           - >
-            LATEST_VERSION=$(wget -O - "https://api.github.com/repos/open-policy-agent/conftest/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/' | cut -c 2-) &&
-            wget "https://github.com/open-policy-agent/conftest/releases/download/v${LATEST_VERSION}/conftest_${LATEST_VERSION}_Linux_x86_64.tar.gz" &&
-            tar xzf conftest_${LATEST_VERSION}_Linux_x86_64.tar.gz &&
-            conftest test '/conftest/examples/kubernetes/deployment+service.yaml' -p /conftest/examples/kubernetes/policy -o json >> /tmp/out.json &&
+            wget 'https://github.com/open-policy-agent/conftest/releases/download/v0.42.1/conftest_0.42.1_Linux_x86_64.tar.gz' &&
+            tar xzf conftest_0.42.1_Linux_x86_64.tar.gz &&
+            conftest test '/conftest/examples/kubernetes/deployment.yaml' -p /conftest/examples/kubernetes/policy -o json >> /tmp/out.json &&
             cat /tmp/out.json
           volumeMounts:
             - name: conftest_code
               mountPath: /conftest
               readOnly: false
-        restartPolicy: Never
+      restartPolicy: Never
   backoffLimit: 1
 ---
 apiVersion: batch/v1
