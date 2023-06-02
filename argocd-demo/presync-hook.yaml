@@ -10,7 +10,7 @@ spec:
   template:
     spec:
       volumes:
-        - name: conftest_code
+        - name: conftest-code
           emptyDir: {}
       initContainers:
         - image: k8s.gcr.io/git-sync:v3.1.6
@@ -25,7 +25,7 @@ spec:
             - "-wait=60"
             - "-ssh=true"
           volumeMounts:
-            - name: conftest_code
+            - name: conftest-code
               mountPath: /conftest
               readOnly: false
           securityContext:
@@ -42,7 +42,7 @@ spec:
             conftest test '/conftest/examples/kubernetes/deployment.yaml' -p /conftest/examples/kubernetes/policy -o json >> /tmp/out.json &&
             cat /tmp/out.json
           volumeMounts:
-            - name: conftest_code
+            - name: conftest-code
               mountPath: /conftest
               readOnly: true
       restartPolicy: Never
