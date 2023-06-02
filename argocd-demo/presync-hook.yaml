@@ -17,7 +17,7 @@ spec:
             secretName: git-creds
             defaultMode: 0400
       initContainers:
-        - image: registry.k8s.io/git-sync/git-sync:v4.0.0
+        - image: registry.k8s.io/git-sync/git-sync:v3.6.6
           name: git-sync-sidecar
           args:
             - --repo=https://github.com/open-policy-agent/conftest.git
