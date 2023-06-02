@@ -19,11 +19,11 @@ spec:
       initContainers:
         - image: registry.k8s.io/git-sync/git-sync:v3.6.5
           name: git-sync-sidecar
-          env:
-          - name: GIT_SYNC_REPO
-            value: https://github.com/open-policy-agent/conftest.git
-          - name: GIT_SYNC_DEST
-            value: /conftest-code/repo
+          args:
+            - --repo=https://github.com/open-policy-agent/conftest.git
+            - --depth=1
+            - --root=/conftest-code
+            - --branch=master
           volumeMounts:
             - name: conftest-code
               mountPath: /conftest-code
@@ -51,7 +51,7 @@ spec:
             ls -lahr /conftest-code/repo &&
             echo "+++++++++++++++++++" &&
             ls -lahr /tmp/data &&
-            /tmp/conftest/conftest test '/conftest-code/repo/examples/kubernetes/deployment.yaml' -p /conftest-code/repo/examples/kubernetes/policy -o json >> /tmp/out.json &&
+            /tmp/conftest/conftest test '/conftest-code/examples/kubernetes/deployment.yaml' -p /conftest-code/examples/kubernetes/policy -o json >> /tmp/out.json &&
             cat /tmp/out.json
           volumeMounts:
             - name: conftest-code
