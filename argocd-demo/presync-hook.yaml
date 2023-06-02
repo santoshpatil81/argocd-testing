@@ -58,7 +58,9 @@ spec:
             echo "+++++++++++++++++++" &&
             ls -lah /conftest-code &&
             echo "+++++++++++++++++++" &&
-            ls -lah /conftest-code/repo &&
+            ls -lahr /conftest-code/repo &&
+            echo "+++++++++++++++++++" &&
+            ls -lahr /tmp/data &&
             /tmp/conftest/conftest test '/conftest-code/repo/examples/kubernetes/deployment.yaml' -p /conftest-code/repo/examples/kubernetes/policy -o json >> /tmp/out.json &&
             cat /tmp/out.json
           volumeMounts:
