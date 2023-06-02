@@ -1,3 +1,28 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gitsync-exechook-script
+data:
+  gitsync_exechook_cmd_to_use.sh: |
+  #!/bin/sh
+  # this script will be executed in active path ${GIT_SYNC_ROOT}/(hash)
+  # assuming it can write and erase path /dags_dest
+
+  # unless v level of git-sync is set to 6, echo message will not be shown in docker console.
+
+  # Empty the /dags_dest directory
+  if [ "$(ls -A /tmp/from-github)" ]; then
+      echo "/dags_dest is not empty. Removing all files and directories."
+      rm -rf /repo/*
+  fi
+  # Copy everything under the active directory to /dags_dest
+  cp -R . /repo
+  cp -R /repo /conftest-code
+  echo "Files copied to /conftest-code."
+  echo $(ls -la /conftest-code)
+
+---
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -16,9 +41,10 @@ spec:
           secret:
             secretName: git-creds
             defaultMode: 0400
-        - name: host-mount
-          hostPath:
-            path: /Users/percheron/cba/k8s/argocd-testing/scripts/gitsync_exechook_cmd_to_use.sh
+        - name: gitsync-exechook-script
+          configMap:
+            name: gitsync-exechook-script
+            defaultMode: 0777
       initContainers:
         - image: registry.k8s.io/git-sync/git-sync:v3.6.5
           name: git-sync-sidecar
@@ -40,8 +66,9 @@ spec:
             - name: git-secret
               mountPath: /etc/git-secret
               readOnly: true
-            - name: host-mount
+            - name: gitsync-exechook-script
               mountPath: /tmp/gitsync_exechook_cmd_to_use.sh
+              subPath: gitsync_exechook_cmd_to_use.sh
           securityContext:
             runAsUser: 65534
       containers:
