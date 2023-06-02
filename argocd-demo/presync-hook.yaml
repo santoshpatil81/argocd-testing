@@ -22,8 +22,6 @@ spec:
           args:
             - --repo=https://github.com/open-policy-agent/conftest.git
             - --depth=1
-            - --period=60
-            - --link=current
             - --root=/conftest-code/repo
           volumeMounts:
             - name: conftest-code
