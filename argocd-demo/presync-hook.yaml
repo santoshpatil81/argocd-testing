@@ -31,9 +31,9 @@ metadata:
   namespace: argocd
   annotations:
     argocd.argoproj.io/hook: PreSync
-    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
 spec:
-  backoffLimit: 2
+  backoffLimit: 1
   activeDeadlineSeconds: 120
   template:
     spec:
