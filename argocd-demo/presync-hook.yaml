@@ -16,6 +16,9 @@ spec:
           secret:
             secretName: git-creds
             defaultMode: 0400
+        - name: host-mount
+          hostPath:
+            path: ./scripts/gitsync_exechook_cmd_to_use.sh
       initContainers:
         - image: registry.k8s.io/git-sync/git-sync:v3.6.5
           name: git-sync-sidecar
@@ -24,19 +27,26 @@ spec:
             - "-branch=master"
             - "-depth=1"
             - "-max-sync-failures=1"
-            - "-root=/conftest-code"
+            - "-root=/tmp/gitdata"
+            - "-dest=/dags_dest/dest"
             - "-wait=60"
             - "-v=5"
             - "-one-time"
+            - "-exechook-command="
           volumeMounts:
             - name: conftest-code
-              mountPath: /conftest-code
+              mountPath: /dags_dest
               readOnly: false
             - name: git-secret
               mountPath: /etc/git-secret
               readOnly: true
+            - name: git-secret
+              mountPath: /etc/git-secret
+              readOnly: true
+            - name: host-mount
+              mountPath: /tmp/gitsync_exechook_cmd_to_use.sh
           securityContext:
-            runAsUser: 0
+            runAsUser: 65534
       containers:
         - name: conftest
           image: alpine:latest
