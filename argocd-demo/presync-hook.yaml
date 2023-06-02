@@ -27,7 +27,6 @@ spec:
             - "-root=/conftest-code"
             - "-dest=from-github"
             - "-wait=60"
-            - "-ssh=true"
           volumeMounts:
             - name: conftest-code
               mountPath: /conftest-code
