@@ -28,6 +28,7 @@ spec:
             - "-dest=from-github"
             - "-wait=60"
             - "-v=5"
+            - "-one-time"
           volumeMounts:
             - name: conftest-code
               mountPath: /conftest-code
