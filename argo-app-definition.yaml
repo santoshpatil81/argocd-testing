@@ -20,4 +20,7 @@ spec:
       - Validate=true
       - CreateNamespace=true
       - preserveResourcesOnDeletion=true
-    retry: 0
+    retry:
+      limit: 1
+      backoff:
+        factor: 1
