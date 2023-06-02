@@ -42,7 +42,7 @@ spec:
               mountPath: /etc/git-secret
               readOnly: true
           securityContext:
-            runAsUser: 65533
+            runAsUser: 0
       containers:
         - name: conftest
           image: alpine:latest
