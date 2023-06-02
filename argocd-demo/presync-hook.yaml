@@ -18,7 +18,7 @@ spec:
             defaultMode: 0400
         - name: host-mount
           hostPath:
-            path: ./scripts/gitsync_exechook_cmd_to_use.sh
+            path: /Users/percheron/cba/k8s/argocd-testing/scripts/gitsync_exechook_cmd_to_use.sh
       initContainers:
         - image: registry.k8s.io/git-sync/git-sync:v3.6.5
           name: git-sync-sidecar
@@ -32,7 +32,7 @@ spec:
             - "-wait=60"
             - "-v=5"
             - "-one-time"
-            - "-exechook-command="
+            - "-exechook-command=/tmp/gitsync_exechook_cmd_to_use.sh"
           volumeMounts:
             - name: conftest-code
               mountPath: /dags_dest
