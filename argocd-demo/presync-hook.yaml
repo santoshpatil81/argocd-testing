@@ -40,9 +40,6 @@ spec:
             - name: git-secret
               mountPath: /etc/git-secret
               readOnly: true
-            - name: git-secret
-              mountPath: /etc/git-secret
-              readOnly: true
             - name: host-mount
               mountPath: /tmp/gitsync_exechook_cmd_to_use.sh
           securityContext:
