@@ -39,6 +39,7 @@ spec:
           - >
             wget 'https://github.com/open-policy-agent/conftest/releases/download/v0.42.1/conftest_0.42.1_Linux_x86_64.tar.gz' &&
             tar xzf conftest_0.42.1_Linux_x86_64.tar.gz &&
+            ls -lah &&
             conftest test '/conftest/examples/kubernetes/deployment.yaml' -p /conftest/examples/kubernetes/policy -o json >> /tmp/out.json &&
             cat /tmp/out.json
           volumeMounts:
