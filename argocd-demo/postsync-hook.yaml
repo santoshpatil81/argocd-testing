@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  generateName: argocd-post-sync-demo-
+  generateName: post-sync-demo-
   namespace: argocd
   annotations:
     argocd.argoproj.io/hook: PostSync
