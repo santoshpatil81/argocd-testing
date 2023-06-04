@@ -126,7 +126,7 @@ spec:
           args:
           - -c
           - >
-            /conftest/bin/conftest test  /git-repo/examples/kubernetes/deployment.yaml -p /conftest-policy/policies -o json
+            /conftest/bin/conftest test  /git-repo/examples/kubernetes/deployment.yaml -p /conftest-policy/policies --all-namespaces -o json
           volumeMounts:
             - name: conftest-bin
               mountPath: /conftest/bin
