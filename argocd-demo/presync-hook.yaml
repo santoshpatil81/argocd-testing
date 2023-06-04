@@ -91,7 +91,7 @@ spec:
               mountPath: /conftest/bin
               readOnly: false
         - name: download-oras
-          image: alpine:latest
+          image: alpine/curl:3.14
           command: ["/bin/sh"]
           args:
           - -c
