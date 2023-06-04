@@ -17,8 +17,8 @@ data:
     # Copy everything under the active directory to /dags_dest
     cp -R . /dags_dest/
     echo "Files copied to /dags_dest."
-    cp -R . /conftest-code
-    echo "Files copied to /conftest-code."
+    cp -R . /conftest-bin
+    echo "Files copied to /conftest-bin."
 
 ---
 apiVersion: batch/v1
@@ -33,7 +33,13 @@ spec:
   template:
     spec:
       volumes:
-        - name: conftest-code
+        - name: conftest-bin
+          emptyDir: {}
+        - name: oras-bin
+          emptyDir: {}
+        - name: policies
+          emptyDir: {}
+        - name: cloned-repo
           emptyDir: {}
         - name: git-secret
           secret:
@@ -45,7 +51,7 @@ spec:
             defaultMode: 0777
       initContainers:
         - image: registry.k8s.io/git-sync/git-sync:v3.6.5
-          name: git-sync-sidecar
+          name: git-clone-repo-to-test
           args:
             - "-repo=https://github.com/open-policy-agent/conftest.git"
             - "-branch=master"
@@ -58,7 +64,7 @@ spec:
             - "-one-time"
             - "-exechook-command=/tmp/gitsync_exechook_cmd_to_use.sh"
           volumeMounts:
-            - name: conftest-code
+            - name: cloned-repo
               mountPath: /dags_dest
               readOnly: false
             - name: git-secret
@@ -69,8 +75,7 @@ spec:
               subPath: gitsync_exechook_cmd_to_use.sh
           securityContext:
             runAsUser: 65534
-      containers:
-        - name: conftest
+        - name: download-conftest
           image: alpine:latest
           command: ["/bin/sh"]
           args:
@@ -79,10 +84,59 @@ spec:
             wget 'https://github.com/open-policy-agent/conftest/releases/download/v0.42.1/conftest_0.42.1_Linux_x86_64.tar.gz' &&
             mkdir -p /tmp/conftest &&
             tar xzf conftest_0.42.1_Linux_x86_64.tar.gz --directory /tmp/conftest &&
-            /tmp/conftest/conftest test /conftest-code/examples/kubernetes/deployment.yaml -p /conftest-code/examples/kubernetes/policy -o json
+            mkdir -p /conftest/bin &&
+            cp /tmp/conftest/conftest /conftest/bin
           volumeMounts:
-            - name: conftest-code
-              mountPath: /conftest-code
+            - name: conftest-bin
+              mountPath: /conftest/bin
+              readOnly: true
+        - name: download-oras
+          image: alpine:latest
+          command: ["/bin/sh"]
+          args:
+          - -c
+          - >
+            VERSION="1.0.0"
+            curl -LO "https://github.com/oras-project/oras/releases/download/v${VERSION}/oras_${VERSION}_linux_amd64.tar.gz"
+            mkdir -p oras-install/
+            tar -zxf oras_${VERSION}_*.tar.gz -C oras-install/
+            mv oras-install/oras /oras/bin/
+            rm -rf oras_${VERSION}_*.tar.gz oras-install/
+          volumeMounts:
+            - name: oras-bin
+              mountPath: /oras/bin
+              readOnly: true
+        - name: download-policies
+          image: alpine:latest
+          command: ["/bin/sh"]
+          args:
+          - -c
+          - >
+            /oras/bin/oras pull docker.io/santoshpatil81/policies:latest  --output /conftest-policy
+          volumeMounts:
+            - name: policies
+              mountPath: /conftest-policy
+              readOnly: true
+            - name: oras-bin
+              mountPath: /oras/bin
+              readOnly: true
+      containers:
+        - name: conftest
+          image: alpine:latest
+          command: ["/bin/sh"]
+          args:
+          - -c
+          - >
+            /conftest/bin/conftest test  /git-repo/examples/kubernetes/deployment.yaml -p /conftest-policy/policies -o json
+          volumeMounts:
+            - name: conftest-bin
+              mountPath: /conftest/bin
+              readOnly: true
+            - name: policies
+              mountPath: /conftest-policy
+              readOnly: true
+            - name: cloned-repo
+              mountPath: /git-repo
               readOnly: true
       restartPolicy: Never
   backoffLimit: 0
