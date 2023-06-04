@@ -28,7 +28,7 @@ metadata:
   namespace: argocd
   annotations:
     argocd.argoproj.io/hook: PreSync
-    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
 spec:
   template:
     spec:
@@ -126,7 +126,7 @@ spec:
           args:
           - -c
           - >
-            /conftest/bin/conftest test  /git-repo/examples/kubernetes/deployment.yaml -p /conftest-policy/policies --all-namespaces -o json
+            /conftest/bin/conftest test  /git-repo/examples/kubernetes/deployment.yaml -p /conftest-policy/policies --all-namespaces
           volumeMounts:
             - name: conftest-bin
               mountPath: /conftest/bin
